@@ -1,4 +1,4 @@
-var input = "Im sorry I want to be out of these clothes so wait"
+var input = "any sentence here"
 
 input = input.toLowerCase().replace(/,/g, "").replace(/ /g, "").replace(/\./g, "")
 let finalPair
