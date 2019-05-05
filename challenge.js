@@ -1,13 +1,36 @@
-var input = "any sentence here"
+var input = "aaaaabbbbbcccccdddddfffffgggggaaaaabbbbbcccccdddddfffffgggggaaaaabbbbbcccccdddddfffffgggggaaaaabbbbbcccccdddddfffffgggggaaaaabbbbbcccccdddddfffffggggg"
+let alphabet = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"]
 //format the string to remove spaces and punctuation
 input = input.toLowerCase().replace(/,/g, "").replace(/ /g, "").replace(/\./g, "")
-let finalPair
+let gridSize
+let coordinateList = []
 //the class for the pairs
 function pair(a,b){
-  this.a = a
-  this.b = b
+  this.column = a
+  this.row = b
 }
+function coordinate(ori,shuf){
+  this.originalPoint = ori;
+  this.newPoint = shuf
+}
+function shuffle(array) {
+    var m = array.length,
+        t, i;
 
+    // While there remain elements to shuffle…
+    while (m) {
+
+        // Pick a remaining element…
+        i = Math.floor(Math.random() * m--);
+
+        // And swap it with the current element.
+        t = array[m];
+        array[m] = array[i];
+        array[i] = t;
+    }
+
+    return array;
+}
 let cryptoStrings  = []
 //this function finds the optimal grid size for the final product by finding the closest pair of numbers that multiply too the string length eg a string of 64 returns 8/8
 function findPairs(length) {
@@ -22,35 +45,65 @@ for(x=0;x<length/2;x++){
 
 }
 //sort the pairs so the pair with the lowest difference is first in the list, also the first number of the pair should be higher than the second
+
 pairs = pairs.sort(function(x,y){
-let difference1 = x.a - x.b
-let difference2 = y.a - y.b
-if(difference1 < 0){difference1 = 1000000}
-if(difference2 < 0){difference2 = 1000000}
+let difference1 = x.column - x.row
+let difference2 = y.column - y.row
+if(difference1 < 0){difference1 = x.row - x.column}
+if(difference2 < 0){difference2 = y.row - y.column}
 return difference1 > difference2
 })
 
 let idealPair = pairs[0]
-while(idealPair.a > idealPair.b+1){
-  idealPair.a--
-  idealPair.b++
+if(idealPair.column === idealPair.row){
+  idealPair.column++
+  idealPair.row--
 }
-finalPair = idealPair
+if(idealPair.column < idealPair.row){
+  let newRow = idealPair.column
+  let newColumn = idealPair.row
+  idealPair = new pair(newColumn,newRow)
+
+
+}
+while(idealPair.column > idealPair.row+1){
+
+  idealPair.column--
+  idealPair.row++
+}
+gridSize = idealPair
 }
 findPairs(input.length)
-console.log("*")
+
 //format the rows so that the input is readable in the columns
-for(k = 0; k<=finalPair.b; k++){
+for(k = 0; k<=gridSize.row; k++){
   let thisString = ""
-  for(m=k;m<input.length;m+=finalPair.a){
+  for(m=k;m<input.length;m+=gridSize.column){
     thisString += input.charAt(m)
   }
 
-while (thisString.length < finalPair.a){
+while (thisString.length < gridSize.column){
   thisString += " "
 }
 cryptoStrings.push(thisString)
 }
+let encodedArray = []
 for(q=0;q<cryptoStrings.length;q++){
-  console.log(cryptoStrings[q])
+
+  encodedArray.push( cryptoStrings[q])
+
+}
+
+shuffle(encodedArray)
+
+for(g=0;g<cryptoStrings.length;g++){
+
+  let coordinates = new coordinate(g,encodedArray.indexOf(cryptoStrings[g]))
+ coordinateList.push(coordinates)
+}
+console.log(coordinateList)
+for(m=0;m<coordinateList.length;m++){
+  let thisCoordinate = coordinateList[m]
+  console.log(`check ${m} ${cryptoStrings[thisCoordinate.originalPoint]===encodedArray[thisCoordinate.newPoint]}`)
+
 }
